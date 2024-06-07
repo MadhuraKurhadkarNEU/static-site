@@ -100,3 +100,4 @@ Terminate the Application
     kubectl delete -f k8s/pod.yaml
 
 Replace all instances of `your-dockerhub-username`, `your-username`, and `your-jenkins-server` with your actual DockerHub username, GitHub username, and Jenkins server URL, respectively.
+
