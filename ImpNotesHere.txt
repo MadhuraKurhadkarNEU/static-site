@@ -11,10 +11,3 @@ static-site/
 
 -- 
 Add Credentials in Jenkins (Everytime when resources are created):
-
-Open Jenkins and navigate to Manage Jenkins > Manage Credentials.
-Add new credentials:
-Kind: Username with password.
-Username: Your DockerHub username.
-Password: The token generated.
-ID: Set this to dockerhub-credentials-id.
