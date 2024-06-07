@@ -1,8 +1,3 @@
-// Docker repository name : caddy-static-site
-// docker login  -u madhurakurhadkar
-// At the password prompt, enter the personal access token : dckr_pat_mutB4ahMO1IZEu2VUK8Z6sqWB80
-// dckr_pat_mutB4ahMO1IZEu2VUK8Z6sqWB80
-
 pipeline {
     agent any
 
