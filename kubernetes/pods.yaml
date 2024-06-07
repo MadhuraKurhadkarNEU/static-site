@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: caddy-web-server
+spec:
+  containers:
+  - name: caddy
+    image: my-dockerhub-repo/caddy-web-server:latest
+    ports:
+    - containerPort: 8080
+    readinessProbe:
+      httpGet:
+        path: /
+        port: 8080
+      initialDelaySeconds: 5
+      periodSeconds: 10
+    livenessProbe:
+      httpGet:
+        path: /
+        port: 8080
+      initialDelaySeconds: 5
+      periodSeconds: 10
+    volumeMounts:
+    - name: caddy-config-volume
+      mountPath: /etc/caddy/Caddyfile
+      subPath: Caddyfile
+  volumes:
+  - name: caddy-config-volume
+    configMap:
+      name: caddy-config
