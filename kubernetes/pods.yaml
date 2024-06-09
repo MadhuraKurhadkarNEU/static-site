@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: caddy-web-server
+  name: caddy-static-site
 spec:
   containers:
   - name: caddy
-    image: my-dockerhub-repo/caddy-web-server:latest
+    image: madhurakurhadkar/caddy-static-site:latest
     ports:
     - containerPort: 8080
     readinessProbe:
