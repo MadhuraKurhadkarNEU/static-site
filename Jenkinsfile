@@ -1,6 +1,13 @@
 pipeline {
     agent any
 
+    environment {
+        // Define Docker Hub credentials environment variables
+        DOCKER_HUB_USERNAME = credentials('dockerhub').username
+        DOCKER_HUB_PASSWORD = credentials('dockerhub').password
+    }
+
+
     stages {
         stage('Build and Push Docker Image') {
             steps {
