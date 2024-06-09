@@ -25,9 +25,9 @@ pipeline {
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'USER_DOCKER', passwordVariable: 'DOCKER_ACCESS_TOKEN')]) {
-                        sh "docker login -u $USER_DOCKER -p $DOCKER_ACCESS_TOKEN"
+                        sh "docker login -u ${USER_DOCKER} -p ${DOCKER_ACCESS_TOKEN}"
                     }
-                    sh "madhurakurhadkar/caddy-static-site:latest"
+                    sh 'docker push madhurakurhadkar/caddy-static-site:latest'
                 }
             }
         }
