@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+    environment {
+        // Define Docker Hub credentials environment variables
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub')
+    }
+
     stages {
         stage('Checkout') {
             steps{
@@ -24,7 +29,7 @@ pipeline {
         stage('Push Docker Image to DockerHub') {
             steps {
                 script {
-                    withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'USER_DOCKER', passwordVariable: 'DOCKER_ACCESS_TOKEN')]) {
+                    withCredentials(DOCKERHUB_CREDENTIALS) {
                         sh "docker login -u ${USER_DOCKER} -p ${DOCKER_ACCESS_TOKEN}"
                     }
                     sh 'docker push madhurakurhadkar/caddy-static-site:latest'
