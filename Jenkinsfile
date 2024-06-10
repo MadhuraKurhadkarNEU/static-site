@@ -11,7 +11,7 @@ pipeline {
                 script {
                     // Log in to Docker Hub
                     withCredentials(bindings: [usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_HUB_USR', passwordVariable: 'DOCKER_HUB_PSWD')]) {
-                        sh "docker login -u ${DOCKER_HUB_USERNAME} -p ${DOCKER_HUB_PASSWORD}"
+                        sh "docker login -u ${DOCKER_HUB_USR} -p ${DOCKER_HUB_PSWD}"
                     }
                     
                     // Build the Docker image with the version number same as the Jenkins build number
