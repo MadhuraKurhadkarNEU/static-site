@@ -30,8 +30,8 @@ pipeline {
         stage('Push Docker Image to DockerHub') {
             steps {
                 script {
-                    withCredentials(bindings: [credentialsId: 'dockerhub', usernameVariable: 'DOCKER_HUB_USR', passwordVariable: 'DOCKER_HUB_PSW']) {
-                        sh "docker login -u ${DOCKER_HUB_USR} -p ${DOCKER_HUB_PSW}"
+                    withCredentials(bindings: [credentialsId: 'dockerhub', usernameVariable: 'USER_DOCKER', passwordVariable: 'DOCKER_ACCESS_TOKEN']) {
+                        sh "docker login -u ${USER_DOCKER} -p ${DOCKER_ACCESS_TOKEN}"
                     }
                     sh 'docker push madhurakurhadkar/caddy-static-site:latest'
                 }
