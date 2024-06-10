@@ -3,8 +3,7 @@ pipeline {
 
     environment {
         // Define Docker Hub credentials environment variables
-        DOCKER_HUB_USERNAME = credentials('dockerhub').username
-        DOCKER_HUB_PASSWORD = credentials('dockerhub').password
+        DOCKER_HUB = credentials('dockerhub')
     }
 
 
@@ -13,7 +12,7 @@ pipeline {
             steps {
                 script {
                     // Log in to Docker Hub
-                    sh "echo ${DOCKER_HUB_PASSWORD} | docker login -u ${DOCKER_HUB_USERNAME} --password-stdin"
+                    sh "echo $DOCKER_HUB_PSW | docker login -u $DOCKER_HUB_USR --password-stdin"
 
                     // Build the Docker image with the version number same as the Jenkins build number
                     def version = "${env.BUILD_NUMBER}-caddy-static-site-builder"
