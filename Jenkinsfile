@@ -1,73 +1,45 @@
+// ========================
 pipeline {
     agent any
 
+    environment {
+        // Define Docker Hub credentials environment variables
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub')
+    }
+
     stages {
-        stage('Build and Push Docker Image') {
-            environment {
-                // Define Docker Hub credentials environment variables
-                DOCKER_HUB = credentials('dockerhub')
+        stage('Checkout') {
+            steps{
+                script {
+                    checkout([
+                        $class: 'GitSCM',
+                        branches: [[name: 'main']],
+                        userRemoteConfigs: [[credentialsId: 'github_token', url: 'https://github.com/SREArchitect/static-site.git']]
+                    ])
+                }
             }
+        }
+        stage('Build Docker Image') {
             steps {
                 script {
-                    // Log in to Docker Hub
-                    withCredentials(bindings: [usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_HUB_USR', passwordVariable: 'DOCKER_HUB_PSWD')]) {
-                        sh "docker login -u ${DOCKER_HUB_USR} -p ${DOCKER_HUB_PSWD}"
+                    sh 'docker build --no-cache -t madhurakurhadkar/caddy-static-site:latest -f Dockerfile .'
+                }
+            }
+            
+        }
+        stage('Push Docker Image to DockerHub') {
+            steps {
+                script {
+                    withCredentials(bindings: [credentialsId: 'dockerhub', usernameVariable: 'DOCKER_HUB_USR', passwordVariable: 'DOCKER_HUB_PSW']) {
+                        sh "docker login -u ${DOCKER_HUB_USR} -p ${DOCKER_HUB_PSW}"
                     }
-                    
-                    // Build the Docker image with the version number same as the Jenkins build number
-                    def version = "${env.BUILD_NUMBER}-caddy-static-site-builder"
-                    
-                    // Build and push the Docker image
-                    sh "docker buildx build --platform linux/amd64,linux/arm64 -t madhurakurhadkar/caddy-static-site:${version} --push ."
+                    sh 'docker push madhurakurhadkar/caddy-static-site:latest'
                 }
             }
         }
     }
-}
-
-
-// // ========================
-// pipeline {
-//     agent any
-
-//     environment {
-//         // Define Docker Hub credentials environment variables
-//         DOCKERHUB_CREDENTIALS = credentials('dockerhub')
-//     }
-
-//     stages {
-//         stage('Checkout') {
-//             steps{
-//                 script {
-//                     checkout([
-//                         $class: 'GitSCM',
-//                         branches: [[name: 'main']],
-//                         userRemoteConfigs: [[credentialsId: 'github_token', url: 'https://github.com/SREArchitect/static-site.git']]
-//                     ])
-//                 }
-//             }
-//         }
-//         stage('Build Docker Image') {
-//             steps {
-//                 script {
-//                     sh 'docker build --no-cache -t madhurakurhadkar/caddy-static-site:latest -f Dockerfile .'
-//                 }
-//             }
-            
-//         }
-//         stage('Push Docker Image to DockerHub') {
-//             steps {
-//                 script {
-//                     withCredentials([DOCKERHUB_CREDENTIALS]) {
-//                         sh "docker login -u ${USER_DOCKER} -p ${DOCKER_ACCESS_TOKEN}"
-//                     }
-//                     sh 'docker push madhurakurhadkar/caddy-static-site:latest'
-//                 }
-//             }
-//         }
-//     }
     
-// }
+}
 
 // // ====================
 
