@@ -1,14 +1,12 @@
 pipeline {
     agent any
 
-    environment {
-        // Define Docker Hub credentials environment variables
-        DOCKER_HUB = credentials('dockerhub')
-    }
-
-
     stages {
         stage('Build and Push Docker Image') {
+            environment {
+                // Define Docker Hub credentials environment variables
+                DOCKER_HUB = credentials('dockerhub')
+            }
             steps {
                 script {
                     // Log in to Docker Hub
