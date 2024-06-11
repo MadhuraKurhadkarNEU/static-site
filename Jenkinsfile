@@ -1,13 +1,15 @@
+// ========================
 pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'madhurakurhadkar/caddy-static-site:latest'
+        // Define Docker Hub credentials environment variables
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub')
     }
 
     stages {
         stage('Checkout') {
-            steps {
+            steps{
                 script {
                     checkout([
                         $class: 'GitSCM',
@@ -20,23 +22,27 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    sh "docker build --no-cache -t ${env.DOCKER_IMAGE} -f Dockerfile ."
+                    sh 'docker build --no-cache -t madhurakurhadkar/caddy-static-site:latest -f Dockerfile .'
                 }
             }
+            
         }
-        stage('Push Docker Image') {
+        stage('Push Docker Image to DockerHub') {
             steps {
                 script {
-                    echo "Pushing Docker image: ${env.DOCKER_IMAGE}"
+                    // withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'USER_DOCKER', passwordVariable: 'DOCKER_ACCESS_TOKEN')]) {
+                    //     sh "echo ${USER_DOCKER} | docker login -u ${DOCKER_ACCESS_TOKEN} --password-stdin"
+                    // }
                     docker.withRegistry('https://index.docker.io/v1/', 'dockerhub') {
-                        docker.image("${env.DOCKER_IMAGE}").push()
-                    }
+                        sh "echo ${env.DOCKERHUB_CREDENTIALS_PSW} | docker login madhurakurhadkar/caddy-static-site -u ${env.DOCKERHUB_CREDENTIALS_USR} --password-stdin"
+                        sh 'docker push madhurakurhadkar/caddy-static-site:latest'
+                    }                    
                 }
             }
         }
     }
+    
 }
-
 
 // // ====================
 
