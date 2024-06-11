@@ -34,7 +34,7 @@ pipeline {
                     //     sh "echo ${USER_DOCKER} | docker login -u ${DOCKER_ACCESS_TOKEN} --password-stdin"
                     // }
                     sh "echo ${env.DOCKERHUB_CREDENTIALS_PSW} | docker login madhurakurhadkar/caddy-static-site -u ${env.DOCKERHUB_CREDENTIALS_USR} --password-stdin"
-                    sh "echo '********* Login Successfull *********'"
+                    // sh "echo '********* Login Successfull *********'"
                     sh 'docker push madhurakurhadkar/caddy-static-site:latest'
                 }
             }
