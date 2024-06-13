@@ -29,7 +29,7 @@ pipeline {
             steps {
                 script {
                     // Load DockerHub credentials from Jenkins credentials store
-                    withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub', username: 'DOCKERHUB_USERNAME', password: 'DOCKERHUB_PASSWORD')]) {
                         // Docker login using credentials stored in environment variables
                         sh "echo \$DOCKERHUB_PASSWORD | docker login -u \$DOCKERHUB_USERNAME --password-stdin"
                         // Tag and push the Docker image to DockerHub
