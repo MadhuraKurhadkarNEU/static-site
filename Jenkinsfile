@@ -1,4 +1,3 @@
-// ========================
 pipeline {
     agent any
 
@@ -9,7 +8,7 @@ pipeline {
 
     stages {
         stage('Checkout') {
-            steps{
+            steps {
                 script {
                     checkout([
                         $class: 'GitSCM',
@@ -25,24 +24,24 @@ pipeline {
                     sh 'docker build --no-cache -t madhurakurhadkar/caddy-static-site:latest -f Dockerfile .'
                 }
             }
-            
         }
         stage('Push Docker Image to DockerHub') {
             steps {
                 script {
-                     withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
+                    // Load DockerHub credentials from Jenkins credentials store
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
+                        // Docker login using credentials stored in environment variables
                         sh "echo \$DOCKERHUB_PASSWORD | docker login -u \$DOCKERHUB_USERNAME --password-stdin"
+                        // Tag and push the Docker image to DockerHub
+                        sh 'docker push madhurakurhadkar/caddy-static-site:latest'
                     }
-                    // sh "echo ${env.DOCKERHUB_CREDENTIALS_PSW} | docker login madhurakurhadkar/caddy-static-site -u ${env.DOCKERHUB_CREDENTIALS_USR} --password-stdin"
-                    echo "Pushing Docker image..."
-                    sh 'docker push madhurakurhadkar/caddy-static-site:latest'
                     echo 'Docker image push completed.'
                 }
             }
         }
     }
-    
 }
+
 
 // // ====================
 
