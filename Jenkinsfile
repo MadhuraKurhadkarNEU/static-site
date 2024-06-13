@@ -1,104 +1,50 @@
-
+// ========================
 pipeline {
     agent any
 
     environment {
         // Define Docker Hub credentials environment variables
         DOCKERHUB_CREDENTIALS = credentials('dockerhub')
-        DOCKER_IMAGE = 'madhurakurhadkar/caddy-static-site:latest'
     }
 
     stages {
         stage('Checkout') {
             steps{
                 script {
-                    echo 'Checking out the code from GitHub repository...'
                     checkout([
                         $class: 'GitSCM',
                         branches: [[name: 'main']],
                         userRemoteConfigs: [[credentialsId: 'github_token', url: 'https://github.com/SREArchitect/static-site.git']]
                     ])
-                    echo 'Checkout completed.'
                 }
             }
         }
         stage('Build Docker Image') {
             steps {
                 script {
-                    echo 'Building Docker image...'
-                    sh "docker build --no-cache -t ${DOCKER_IMAGE} -f Dockerfile ."
-                    echo 'Docker image build completed.'
+                    sh 'docker build --no-cache -t madhurakurhadkar/caddy-static-site:latest -f Dockerfile .'
                 }
             }
+            
         }
         stage('Push Docker Image to DockerHub') {
             steps {
                 script {
-                    echo 'Logging in to DockerHub...'
-                    withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
-                        sh """
-                            echo ${DOCKERHUB_PASSWORD} | docker login -u ${DOCKERHUB_USERNAME} --password-stdin
-                        """
+                     withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
+                        sh "echo \$DOCKERHUB_PASSWORD | docker login -u \$DOCKERHUB_USERNAME --password-stdin"
                     }
-                    echo 'DockerHub login successful.'
-
-                    echo "Pushing Docker image: ${DOCKER_IMAGE}..."
-                    sh "docker push ${DOCKER_IMAGE}"
+                    // sh "echo ${env.DOCKERHUB_CREDENTIALS_PSW} | docker login madhurakurhadkar/caddy-static-site -u ${env.DOCKERHUB_CREDENTIALS_USR} --password-stdin"
+                    echo "Pushing Docker image..."
+                    sh 'docker push madhurakurhadkar/caddy-static-site:latest'
                     echo 'Docker image push completed.'
                 }
             }
         }
     }
+    
 }
 
-
-
-
-// // ========================
-// pipeline {
-//     agent any
-
-//     environment {
-//         // Define Docker Hub credentials environment variables
-//         DOCKERHUB_CREDENTIALS = credentials('dockerhub')
-//     }
-
-//     stages {
-//         stage('Checkout') {
-//             steps{
-//                 script {
-//                     checkout([
-//                         $class: 'GitSCM',
-//                         branches: [[name: 'main']],
-//                         userRemoteConfigs: [[credentialsId: 'github_token', url: 'https://github.com/SREArchitect/static-site.git']]
-//                     ])
-//                 }
-//             }
-//         }
-//         stage('Build Docker Image') {
-//             steps {
-//                 script {
-//                     sh 'docker build --no-cache -t madhurakurhadkar/caddy-static-site:latest -f Dockerfile .'
-//                 }
-//             }
-            
-//         }
-//         stage('Push Docker Image to DockerHub') {
-//             steps {
-//                 script {
-//                     // withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'USER_DOCKER', passwordVariable: 'DOCKER_ACCESS_TOKEN')]) {
-//                     //     sh "echo ${USER_DOCKER} | docker login -u ${DOCKER_ACCESS_TOKEN} --password-stdin"
-//                     // }
-//                     sh "echo ${env.DOCKERHUB_CREDENTIALS_PSW} | docker login madhurakurhadkar/caddy-static-site -u ${env.DOCKERHUB_CREDENTIALS_USR} --password-stdin"
-//                     sh 'docker push madhurakurhadkar/caddy-static-site:latest'
-//                 }
-//             }
-//         }
-//     }
-    
-// }
-
-// // // ====================
+// // ====================
 
 // Key Features:
 // Manual Git Checkout:
