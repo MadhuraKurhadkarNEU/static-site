@@ -4,43 +4,59 @@ pipeline {
     environment {
         // Define Docker Hub credentials environment variables
         DOCKERHUB_CREDENTIALS = credentials('dockerhub')
+        
+        // GitHub credentials fetched from environment variables
+        USER_GITHUB = credentials('github_token').username
+        PASSWORD_GITHUB = credentials('github_token').password
     }
 
     stages {
         stage('Checkout') {
             steps {
                 script {
+                    echo 'Starting Checkout Stage'
                     checkout([
                         $class: 'GitSCM',
                         branches: [[name: 'main']],
                         userRemoteConfigs: [[credentialsId: 'github_token', url: 'https://github.com/SREArchitect/static-site.git']]
                     ])
+                    echo 'Checkout Completed'
                 }
             }
         }
+        
         stage('Build Docker Image') {
             steps {
                 script {
+                    echo 'Starting Docker Build'
                     sh 'docker build --no-cache -t madhurakurhadkar/caddy-static-site:latest -f Dockerfile .'
+                    echo 'Docker Build Completed'
                 }
             }
         }
+        
         stage('Push Docker Image to DockerHub') {
             steps {
                 script {
-                    // Load DockerHub credentials from Jenkins credentials store
-                    withCredentials([usernamePassword(credentialsId: 'dockerhub', username: 'DOCKERHUB_USERNAME', password: 'DOCKERHUB_PASSWORD')]) {
-                        // Docker login using credentials stored in environment variables
-                        sh "echo \$DOCKERHUB_PASSWORD | docker login -u \$DOCKERHUB_USERNAME --password-stdin"
+                    echo 'Starting DockerHub Login'
+                    // Use withCredentials to bind Docker Hub credentials securely
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
+                        echo 'Credentials Loaded'
+                        echo "DOCKERHUB_USERNAME: $DOCKERHUB_USERNAME"
+                        sh 'echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin'
+                        echo 'DockerHub Login Completed'
+                        
                         // Tag and push the Docker image to DockerHub
+                        echo 'Starting Docker Push'
                         sh 'docker push madhurakurhadkar/caddy-static-site:latest'
+                        echo 'Docker Image Push Completed'
                     }
-                    echo 'Docker image push completed.'
                 }
             }
         }
     }
 }
+
 
 
 // // ====================
