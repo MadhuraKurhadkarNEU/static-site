@@ -6,8 +6,8 @@ pipeline {
         DOCKERHUB_CREDENTIALS = credentials('dockerhub')
         
         // GitHub credentials fetched from environment variables
-        USER_GITHUB = credentials('github_token').username
-        PASSWORD_GITHUB = credentials('github_token').password
+        // USER_GITHUB = credentials('github_token').username
+        // PASSWORD_GITHUB = credentials('github_token').password
     }
 
     stages {
